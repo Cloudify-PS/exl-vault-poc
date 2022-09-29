@@ -35,21 +35,40 @@ dsl_definitions:
     url: { get_input: vault_server }
     token: { get_secret: vault_token }
 
-deployment_settings:
-  default_schedules:
-    refresh:
-      workflow: execute_operation
-      since: '+13min'
-      recurrence: '2min'
-      workflow_parameters:
-        operation: cloudify.interfaces.lifecycle.start
-        node_ids: [policy_matcher]
+# deployment_settings:
+#   default_schedules:
+#     refresh:
+#       workflow: execute_operation
+#       since: '+13min'
+#       recurrence: '2min'
+#       workflow_parameters:
+#         operation: cloudify.interfaces.lifecycle.start
+#         node_ids: [policy_matcher]
    
-
-
 node_templates:
   
   install_node:
+    type:  cloudify.nodes.vault.secret
+    properties:
+      client_config: *vault_config
+      use_external_resource: True
+      resource_config:
+        secret_key: {get_input: secret_key}
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/start_execution.py
+          executor: central_deployment_agent
+          inputs:
+            workflow_id: delete
+            deployment_id: { get_sys: [deployment, id] }
+            queue: true
+            inputs_list: [workflow_id, deployment_id, queue]
+        start:
+          implementation: vault.cloudify_vault.tasks.create_secret
+        update: {}
+        delete: {}
+
 
 
   deployment:
@@ -72,15 +91,24 @@ node_templates:
         deployment:
           id: { get_input: blueprint_id }
 
-workflows:
-
-  deny:
-    mapping: cloudify_custom_workflow.cloudify_custom_workflow.tasks.customwf
-    parameters:
-      nodes_to_runon:
-        default:
-          - status_reporter
-      operations_to_execute:
-        default:
-          - two.stage.deployment.set_denied_status
-          - cloudify.interfaces.lifecycle.start
+  uninstall_node:
+    type:  cloudify.nodes.vault.secret
+    properties:
+      client_config: *vault_config
+      use_external_resource: True
+      resource_config:
+        secret_key: {get_input: secret_key}
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create: {}  
+        update: {}
+        stop:
+          implementation: scripts/start_execution.py
+          executor: central_deployment_agent
+          inputs:
+            workflow_id: delete
+            deployment_id: { get_sys: [deployment, id] }
+            queue: true
+            inputs_list: [workflow_id, deployment_id, queue]
+        delete:
+          implementation: vault.cloudify_vault.tasks.create_secret
