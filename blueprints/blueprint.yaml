@@ -2,6 +2,7 @@ tosca_definitions_version: cloudify_dsl_1_4
 
 imports:
   - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - plugin:cloudify-vault-plugin
 
 inputs:
 
@@ -20,6 +21,10 @@ inputs:
   vault_server:
     type: string
     default: 'http://15.222.47.34:8200'
+  
+  secret_key:
+    type: string
+    default: hello
   
   # trust_all:
   #   type: boolean
@@ -47,68 +52,76 @@ dsl_definitions:
    
 node_templates:
   
-  install_node:
+  install_vault_secrets:
     type:  cloudify.nodes.vault.secret
     properties:
       client_config: *vault_config
       use_external_resource: True
       resource_config:
+        create_secret: True
         secret_key: {get_input: secret_key}
+        secret_name: { concat: [{get_input: secret_key}, '_', { get_sys: [deployment, id] }] }
     interfaces:
       cloudify.interfaces.lifecycle:
-        create:
-          implementation: scripts/start_execution.py
-          executor: central_deployment_agent
-          inputs:
-            workflow_id: delete
-            deployment_id: { get_sys: [deployment, id] }
-            queue: true
-            inputs_list: [workflow_id, deployment_id, queue]
+        create: {}
+          # implementation: scripts/start_execution.py
+          # executor: central_deployment_agent
+          # inputs:
+          #   workflow_id: delete
+          #   deployment_id: { get_sys: [deployment, id] }
+          #   queue: true
+          #   inputs_list: [workflow_id, deployment_id, queue]
         start:
           implementation: vault.cloudify_vault.tasks.create_secret
         update: {}
         delete: {}
 
+  # deployment:
+  #   type: cloudify.nodes.Component 
+  #   properties:
+  #     # client:
+  #     #   host: { get_environment_capability: cloudify_manager_endpoint }
+  #     #   username: { get_environment_capability: cloudify_manager_username }
+  #     #   password: { get_secret: { get_input: cloudify_password_secret_name } }
+  #     #   tenant: { get_environment_capability: cloudify_manager_tenant }
+  #     #   port: { get_environment_capability: cloudify_manager_port }
+  #     #   protocol: { get_environment_capability: cloudify_manager_protocol }
+  #     #   trust_all: { get_input: trust_all}
+  #     resource_config:
+  #       blueprint:
+  #         id: { get_secret: { concat: [ { get_input: secret_key}, '_', { get_sys: [deployment, id] }] } }
+  #         main_file_name: { get_input: main_file_name }
+  #         external_resource: false
+  #         blueprint_archive: { get_input: blueprint_archive }
+  #       deployment:
+  #         id: { get_secret: { concat: [{get_input: secret_key}, '_', { get_sys: [deployment, id] }] } }
+  #   relationships:
+  #   - type: cloudify.relationships.depends_on
+  #     target: install_vault_secrets
 
-
-  deployment:
-    type: cloudify.nodes.Component 
-    properties:
-      # client:
-      #   host: { get_environment_capability: cloudify_manager_endpoint }
-      #   username: { get_environment_capability: cloudify_manager_username }
-      #   password: { get_secret: { get_input: cloudify_password_secret_name } }
-      #   tenant: { get_environment_capability: cloudify_manager_tenant }
-      #   port: { get_environment_capability: cloudify_manager_port }
-      #   protocol: { get_environment_capability: cloudify_manager_protocol }
-      #   trust_all: { get_input: trust_all}
-      resource_config:
-        blueprint:
-          id: { get_input: blueprint_id }
-          main_file_name: { get_input: main_file_name }
-          external_resource: false
-          blueprint_archive: { get_input: blueprint_archive }
-        deployment:
-          id: { get_input: blueprint_id }
-
-  uninstall_node:
-    type:  cloudify.nodes.vault.secret
-    properties:
-      client_config: *vault_config
-      use_external_resource: True
-      resource_config:
-        secret_key: {get_input: secret_key}
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create: {}  
-        update: {}
-        stop:
-          implementation: scripts/start_execution.py
-          executor: central_deployment_agent
-          inputs:
-            workflow_id: delete
-            deployment_id: { get_sys: [deployment, id] }
-            queue: true
-            inputs_list: [workflow_id, deployment_id, queue]
-        delete:
-          implementation: vault.cloudify_vault.tasks.create_secret
+  # uninstall_node:
+  #   type:  cloudify.nodes.vault.secret
+  #   properties:
+  #     client_config: *vault_config
+  #     use_external_resource: True
+        # create_secret: True
+  #     resource_config:
+  #       secret_key: { get_input: secret_key}
+  #       secret_name: { concat: [{get_input: secret_key}, '_', { get_sys: [deployment, id] }] }
+  #   interfaces:
+  #     cloudify.interfaces.lifecycle:
+  #       create: {}  
+  #       update: {}
+  #       stop:
+  #         implementation: scripts/start_execution.py
+  #         executor: central_deployment_agent
+  #         inputs:
+  #           workflow_id: delete
+  #           deployment_id: { get_sys: [deployment, id] }
+  #           queue: true
+  #           inputs_list: [workflow_id, deployment_id, queue]
+  #       delete:
+  #         implementation: vault.cloudify_vault.tasks.create_secret
+  #   relationships:
+  #     - type: cloudify.relationships.depends_on
+  #       target: deployment
