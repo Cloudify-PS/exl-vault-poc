@@ -1,0 +1,128 @@
+tosca_definitions_version: cloudify_dsl_1_4
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - plugin:cloudify-vault-plugin
+
+inputs:
+
+  main_file_name:
+    type: string
+    default: blueprint.yaml
+  
+  blueprint_archive:
+    type: string
+    default: https://github.com/mateuszmizer/exl_public/raw/main/blueprint2.zip
+  
+  vault_server:
+    type: string
+    default: 'http://15.222.47.34:8200'
+  
+  secret_keys:
+    type: list
+    default:
+    - create_secret: True
+      secret_key: hi
+      secret_name: { concat: ['hi_', { get_sys: [deployment, id] }] }
+    - create_secret: True
+      secret_key: hello
+      secret_name: { concat: ['hello_', { get_sys: [deployment, id] }] }
+
+dsl_definitions:
+
+  vault_config: &vault_config
+    url: { get_input: vault_server }
+    token: { get_secret: vault_token }
+   
+node_templates:
+  
+  install_vault_secrets:
+    type:  cloudify.nodes.vault.bunch_secrets
+    properties:
+      client_config: *vault_config
+      use_external_resource: True
+      resource_config:  {get_input: secret_keys}
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/start_execution.py
+          executor: central_deployment_agent
+          inputs:
+            inputs_list: [workflow_id, deployment_id, queue, parameters]
+            workflow_id: execute_operation
+            deployment_id: { get_sys: [deployment, id] }
+            queue: true
+            parameters:
+              operation: cloudify.interfaces.vault.delete
+              node_ids: [install_vault_secrets]
+        start:
+          implementation: vault.cloudify_vault.tasks.bunch_create_secrets
+        update: {}
+        delete: {}
+      cloudify.interfaces.vault:
+        delete:
+          implementation: vault.cloudify_vault.tasks.bunch_delete_secrets
+
+  deployment1:
+    type: cloudify.nodes.Component 
+    properties:
+      resource_config:
+        blueprint:
+          # id: { concat: [ 'deployment1_', { get_sys: [deployment, id] }]}
+          id: deployment1
+          main_file_name: { get_input: main_file_name }
+          external_resource: false
+          blueprint_archive: { get_input: blueprint_archive }
+        deployment:
+          id: deployment1
+          inputs:
+            hello_secret_name:  { concat: [ 'hello_', { get_sys: [deployment, id] }] }
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: install_vault_secrets
+  
+  deployment2:
+    type: cloudify.nodes.Component 
+    properties:
+      resource_config:
+        blueprint:
+          id: deployment2
+          main_file_name: { get_input: main_file_name }
+          external_resource: false
+          blueprint_archive: { get_input: blueprint_archive }
+        deployment:
+          id: deployment2
+          inputs:
+            hello_secret_name:  { concat: [ 'hi_', { get_sys: [deployment, id] }] }
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: install_vault_secrets
+
+  uninstall_vault_secrets:
+    type:  cloudify.nodes.vault.bunch_secrets
+    properties:
+      client_config: *vault_config
+      use_external_resource: True
+      resource_config: {get_input: secret_keys}
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create: {}  
+        update: {}
+        stop:
+          implementation: scripts/start_execution.py
+          executor: central_deployment_agent
+          inputs:
+            inputs_list: [workflow_id, deployment_id, queue, parameters]
+            workflow_id: execute_operation
+            deployment_id: { get_sys: [deployment, id] }
+            queue: true
+            parameters:
+              operation: cloudify.interfaces.vault.delete
+              node_ids: [install_vault_secrets]
+        delete:
+          implementation: vault.cloudify_vault.tasks.bunch_create_secrets
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: deployment1
+      - type: cloudify.relationships.depends_on
+        target: deployment2
