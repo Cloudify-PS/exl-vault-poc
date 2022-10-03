@@ -27,7 +27,7 @@ dsl_definitions:
 node_templates:
   
   install_vault_secrets:
-    type:  cloudify.nodes.vault.secret
+    type:  cloudify.nodes.vault.Secret
     properties:
       client_config: *vault_config
       use_external_resource: True
@@ -75,7 +75,7 @@ node_templates:
       target: install_vault_secrets
 
   uninstall_vault_secrets:
-    type:  cloudify.nodes.vault.secret
+    type:  cloudify.nodes.vault.Secret
     properties:
       client_config: *vault_config
       use_external_resource: True
