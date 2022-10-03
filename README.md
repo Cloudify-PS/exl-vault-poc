@@ -63,18 +63,8 @@ client_token_policies is a list object
       client_token_policies:
        - secret
 ```
-By default, plugin use _secret_ policy to create API token and the policy must contains
-Example:
-```
-    properties:
-      client_config: *vault_config
-      use_external_resource: True
-      use_api_client_token: True
-      client_token_policies:
-       - secret
-       - secret2
-```
-The secret policy must contains correct priviliges regarding to used path
+
+By default, plugin use _secret_ policy to create API token and the policy must contains correct priviliges regarding to used path
 Example:
 ```
 path "secret*" {
