@@ -12,14 +12,14 @@ It consists of 3 phases:
 
 Requirements of the blueprint:
 
-local secrets:
-- vault_token - token to read from Vault
-- vault_url - full URL and port of Vault (for example: "http://10.10.10.10:8200")
-Blueprint inputs:
-- main_file_name - name of main blueprint in package (wrapped deployment)
-- blueprint_archive - url to package (wrapped)
-- secret_key - name of Vault secret to populate (only for blueprints)
-- secret_keys - list of Vault secrets (only for blueprint_multiple_secrets)
+- local secrets:
+  - vault_token - token to read from Vault
+  - vault_url - full URL and port of Vault (for example: "http://10.10.10.10:8200")
+- Blueprint inputs:
+  - main_file_name - name of main blueprint in package (wrapped deployment)
+  - blueprint_archive - url to package (wrapped)
+  - secret_key - name of Vault secret to populate (only for blueprints)
+  - secret_keys - list of Vault secrets (only for blueprint_multiple_secrets)
 
 An example of how to use the packages:
 
