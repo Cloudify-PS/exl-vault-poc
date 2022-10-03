@@ -3,47 +3,47 @@
 To create an exemplary blueprint, please upload one from blueprints.zip file.  
 
 ## Blueprint packages
-Package is used to install a target deployment (wrapped deployment) with one secret (blueprints package) or with list of secrets (blueprint_multiple_secrets) from Vault.
+Package is used to install a target deployment (wrapped deployment) with one secret (blueprints package) or with list of secrets ( blueprint_multiple_secrets ) from Vault.
 It consists of 3 phases:
 
-1. schedule the removal of secrets - just to be sure the newly created secrets will be removed even when the installation is unsuccessful
-2. obtain and save secrets - reads required secrets from the Vault and saves them temporarily in local Cloudify secrets
-3. execute install/uninstall workflow on deployment - during execution the secrets are available. Once the execution finishes, the secrets are safely removed.
+ - _schedule the removal of secrets_ - just to be sure the newly created secrets will be removed even when the installation is unsuccessful
+ - _obtain and save secrets_ - reads required secrets from the Vault and saves them temporarily in local Cloudify secrets
+ - _execute install/uninstall workflow on deployment - during execution the secrets are available. Once the execution finishes, the secrets are safely removed.
 
 Requirements of the blueprint:
 
-- local secrets:
-  - vault_token - token to read from Vault
-  - vault_url - full URL and port of Vault (for example: "http://10.10.10.10:8200")
-- Blueprint inputs:
-  - main_file_name - name of main blueprint in package (wrapped deployment)
-  - blueprint_archive - url to package (wrapped)
-  - secret_key - name of Vault secret to populate (only for blueprints)
-  - secret_keys - list of Vault secrets (only for blueprint_multiple_secrets)
+ - local secrets:
+   - _vault_token_ - token to read from Vault
+   - _vault_url_ - full URL and port of Vault (for example: "http://10.10.10.10:8200")
+ - Blueprint inputs:
+   - _main_file_name_ - name of main blueprint in package (wrapped deployment)
+   - _blueprint_archive_ - url to package (wrapped)
+   - _secret_key_ - name of Vault secret to populate (only for blueprints)
+   - _secret_keys_ - list of Vault secrets (only for blueprint_multiple_secrets)
 
 An example of how to use the packages:
 
 ### Uploading:
-
+'''
 curl -X PUT \
     --header "Tenant: default_tenant" \
     --header "Content-Type: application/json" \
     -u admin:admin \
     "http://localhost/api/v3.1/blueprints/main_blueprint?application_file_name=blueprint.yaml&visibility=tenant&blueprint_archive_url=https://url/to/archive/master.zip&labels=customer=EXL1"
-
+'''
 
 ### Create deployment blueprint
-
+'''
 curl -X PUT \
     --header "Tenant: default_tenant" \
     --header "Content-Type: application/json" \
     -u admin:admin \
     -d '{"blueprint_id": "main_blueprint", "inputs": {"main_file_name": "blueprint_child.yaml", "blueprint_archive": "https://url/to_child/archive/master.zip", "secret_key": "vaultkey1" }, "visibility": "tenant", "site_name": "LONDON", "labels": [{"customer": "EXL1"}]}' \
     "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
-	
+'''
 
 ### Create deployment  blueprint_multiple_secrets
-
+'''
 curl -X PUT \
     --header "Tenant: default_tenant" \
     --header "Content-Type: application/json" \
