@@ -13,11 +13,7 @@ inputs:
   blueprint_archive:
     type: string
     default: https://github.com/mateuszmizer/exl_public/raw/main/blueprint2.zip
-  
-  vault_server:
-    type: string
-    default: 'http://15.222.47.34:8200'
-  
+   
   secret_key:
     type: string
     default: hello
@@ -25,7 +21,7 @@ inputs:
 dsl_definitions:
 
   vault_config: &vault_config
-    url: { get_input: vault_server }
+    url: { get_secret: vault_server }
     token: { get_secret: vault_token }
    
 node_templates:
