@@ -51,6 +51,41 @@ curl -X PUT \
     -d '{"blueprint_id": "main_blueprint", "inputs": {"main_file_name": "blueprint_child.yaml", "blueprint_archive": "https://url/to_child/archive/master.zip", "secret_keys": ["vaultkey1", "vaultkey2"] }, "visibility": "tenant", "site_name": "LONDON", "labels": [{"customer": "EXL1"}]}' \
     "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
 ```
+### Vault Policies 
+The packages contains properties part for nodes cloudify.nodes.vault.Bunch_secrets/cloudify.nodes.vault.Secret can contains information about the vault API token policies under client_token_policies.
+client_token_policies is a list object
+
+```
+    properties:
+      client_config: *vault_config
+      use_external_resource: True
+      use_api_client_token: True
+      client_token_policies:
+       - secret
+```
+By default, plugin use _secret_ policy to create API token and the policy must contains
+Example:
+```
+    properties:
+      client_config: *vault_config
+      use_external_resource: True
+      use_api_client_token: True
+      client_token_policies:
+       - secret
+       - secret2
+```
+The secret policy must contains correct priviliges regarding to used path
+Example:
+```
+path "secret*" {
+  capabilities = [ "create", "read", "update", "delete", "list", "sudo" ]
+}
+
+path "secret/data/foo" {
+  capabilities = ["read"]
+}
+```
+
 
 ## Custom workflows
 The examples of running workflows using Cloudify Manager's API calls are implemented in the Postman Collection: https://www.getpostman.com/collections/e76f72a2a89d598509ac
