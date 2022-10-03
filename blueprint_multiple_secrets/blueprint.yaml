@@ -37,6 +37,7 @@ node_templates:
     properties:
       client_config: *vault_config
       use_external_resource: True
+      use_api_client_token: True
       resource_config:  {get_input: secret_keys}
     interfaces:
       cloudify.interfaces.lifecycle:
