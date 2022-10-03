@@ -8,7 +8,7 @@ It consists of 3 phases:
 
  - _schedule the removal of secrets_ - just to be sure the newly created secrets will be removed even when the installation is unsuccessful
  - _obtain and save secrets_ - reads required secrets from the Vault and saves them temporarily in local Cloudify secrets
- - _execute install/uninstall workflow on deployment - during execution the secrets are available. Once the execution finishes, the secrets are safely removed.
+ - _execute install/uninstall workflow on deployment_ - during execution the secrets are available. Once the execution finishes, the secrets are safely removed.
 
 Requirements of the blueprint:
 
@@ -24,33 +24,33 @@ Requirements of the blueprint:
 An example of how to use the packages:
 
 ### Uploading:
-'''
+```
 curl -X PUT \
     --header "Tenant: default_tenant" \
     --header "Content-Type: application/json" \
     -u admin:admin \
     "http://localhost/api/v3.1/blueprints/main_blueprint?application_file_name=blueprint.yaml&visibility=tenant&blueprint_archive_url=https://url/to/archive/master.zip&labels=customer=EXL1"
-'''
+```
 
 ### Create deployment blueprint
-'''
+```
 curl -X PUT \
     --header "Tenant: default_tenant" \
     --header "Content-Type: application/json" \
     -u admin:admin \
     -d '{"blueprint_id": "main_blueprint", "inputs": {"main_file_name": "blueprint_child.yaml", "blueprint_archive": "https://url/to_child/archive/master.zip", "secret_key": "vaultkey1" }, "visibility": "tenant", "site_name": "LONDON", "labels": [{"customer": "EXL1"}]}' \
     "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
-'''
+```
 
 ### Create deployment  blueprint_multiple_secrets
-'''
+```
 curl -X PUT \
     --header "Tenant: default_tenant" \
     --header "Content-Type: application/json" \
     -u admin:admin \
     -d '{"blueprint_id": "main_blueprint", "inputs": {"main_file_name": "blueprint_child.yaml", "blueprint_archive": "https://url/to_child/archive/master.zip", "secret_keys": ["vaultkey1", "vaultkey2"] }, "visibility": "tenant", "site_name": "LONDON", "labels": [{"customer": "EXL1"}]}' \
     "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
-
+```
 
 ## Custom workflows
 The examples of running workflows using Cloudify Manager's API calls are implemented in the Postman Collection: https://www.getpostman.com/collections/e76f72a2a89d598509ac
