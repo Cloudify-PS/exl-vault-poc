@@ -60,7 +60,7 @@ The packages contains properties part for nodes cloudify.nodes.vault.Bunch_secre
       use_external_resource: True
       resource_config: {get_input: secret_keys}
 ```
-use_external_resource provides information if secrets are already existed (if False, plugin will create the secret) and about resource_config which is cloudify.types.vault.Secret object.
+use_external_resource provides information if secrets are already existed (if False, plugin will create the secret) and about resource_config which is cloudify.types.vault.Secret data types.
 ```
   cloudify.types.vault.Secret:
     properties:
@@ -92,31 +92,34 @@ use_external_resource provides information if secrets are already existed (if Fa
         default: 'secret'
 ```
 
-Object client_config provides information about Vault server and is specified in dsl_definitions of plugin.
+Object client_config provides information about Vault server and is specified in cloudify.types.vault.ClientConfig data types.
 
 ```
-dsl_definitions:
-
-  client_config: &client_config
-    client_config:
-      type: cloudify.types.vault.ClientConfig
-      description: Your Vault client configuration.
-      required: false
-    use_api_client_token:
-      type: boolean
-      description: >
-        Auto-generate and use a new API Client token with adequate
-        policies for managing Vault resources. If set to false, plugin
-        will use the Master Token for all operations.
-      required: false
-      default: false
-    client_token_policies:
-      type: list
-      description: >
-        Valid only when `use_api_client_token` is enabled. A list of
-        policies to be granted for new API Client token.
-      required: false
-      default: [secret]
+  cloudify.types.vault.ClientConfig:
+    properties:
+      url:
+        description: Vault URL.
+        type: string
+        default: ''
+      token:
+        description: User Token used to authenticate to Vault.
+        type: string
+        default: ''
+      use_api_client_token:
+        type: boolean
+        description: >
+          Auto-generate and use a new API Client token with adequate
+          policies for managing Vault resources. If set to false, plugin
+          will use the Master Token for all operations.
+        required: false
+        default: false
+      client_token_policies:
+        type: list
+        description: >
+          Valid only when `use_api_client_token` is enabled. A list of
+          policies to be granted for new API Client token.
+        required: false
+        default: [secret]
     
 ```
 If plugin should use local API token (https://www.vaultproject.io/api-docs/auth/token) for secrets reading, the value of use_api_client_token must be True (by default is False). When use_api_client_token is True, master token specified in cloudify.types.vault.ClientConfig is used for generate local API token with ttl equal to 90s. You can also specify the vault API token policies under client_token_policies which is a list object.
