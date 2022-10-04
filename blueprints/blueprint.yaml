@@ -23,6 +23,7 @@ dsl_definitions:
   vault_config: &vault_config
     url: { get_secret: vault_server }
     token: { get_secret: vault_token }
+    use_api_client_token: True
    
 node_templates:
   
@@ -31,7 +32,6 @@ node_templates:
     properties:
       client_config: *vault_config
       use_external_resource: True
-      use_api_client_token: True
       resource_config:
         create_secret: True
         secret_key: {get_input: secret_key}
