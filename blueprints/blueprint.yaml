@@ -49,7 +49,6 @@ node_templates:
             parameters:
               operation: cloudify.interfaces.vault.delete
               node_ids: [install_vault_secrets]
-              # node_instance_ids: [ get_attribute: [install_vault_secrets, node_instance_id] ]
         start:
           implementation: vault.cloudify_vault.tasks.create_secret
         update: {}
@@ -99,7 +98,6 @@ node_templates:
             parameters:
               operation: cloudify.interfaces.vault.delete
               node_ids: [install_vault_secrets]
-              # node_instance_ids: [ get_attribute: [install_vault_secrets, node_instance_id] ]
         delete:
           implementation: vault.cloudify_vault.tasks.create_secret
     relationships:

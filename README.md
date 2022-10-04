@@ -15,7 +15,7 @@ Requirements of the blueprint:
  - local secrets:
    - _vault_token_ - token to read from Vault
    - _vault_url_ - full URL and port of Vault (for example: "http://10.10.10.10:8200")
- - Blueprint inputs:
+ - blueprint inputs:
    - _main_file_name_ - name of main blueprint in package (wrapped deployment)
    - _blueprint_archive_ - url to package (wrapped)
    - _secret_key_ - name of Vault secret to populate (only for blueprints)
@@ -52,78 +52,19 @@ curl -X PUT \
     "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
 ```
 ### Temporary API token and Vault Policies
-The packages contains properties part for nodes cloudify.nodes.vault.Bunch_secrets/cloudify.nodes.vault.Secret which has information about client_config and resources.
+The main [cloudify-vault-plugin](https://github.com/ahmadiesa-abu/cloudify-vault-plugin/tree/exl_changes) nodes are:
+- cloudify.nodes.vault.Secret
+- cloudify.nodes.vault.Bunch_secrets
 
-```
-    properties:
-      client_config: *vault_config
-      use_external_resource: True
-      resource_config: {get_input: secret_keys}
-```
-use_external_resource provides information if secrets are already existed (if False, plugin will create the secret) and about resource_config which is cloudify.types.vault.Secret data types.
-```
-  cloudify.types.vault.Secret:
-    properties:
-      secret_key:
-        description: Secret Key [Path]
-        type: string
-        default: ''
-      secret_value:
-        description: Secret Value
-        default: {}
-      create_secret:
-        description: >
-          A condition whether to store the secret value in Cloudify
-          Manager secrets.
-        type: boolean
-        default: false
-      secret_name:
-        description: >
-          Name of the secret created in Cloudify secrets. Used when
-          create_secret flag is enabled.
-        type: string
-        default: ''
-      mount_point:
-        description: >
-          A mount_point parameter that can be used to address the KvV1
-          secret engine under a custom mount path. The full path of the
-          secret inside Vault.
-        type: string
-        default: 'secret'
-```
+They are used to create or read a single or multiple Vault secrets at once (accordingly).  
+Each node type has information about the resource in its _resource_config_ property of _cloudify.types.vault.Secret_ type.  
+For more details please refer to the [plugin.yaml](https://github.com/ahmadiesa-abu/cloudify-vault-plugin/blob/exl_changes/plugin.yaml) file of the plugin.  
+_use_external_resource_ property provides information if secrets already exist in the Vault (if `False`, plugin will create the secret).  
+Object _client_config_ provides information about Vault server and its connection. It is specified in _cloudify.types.vault.ClientConfig_ data type.  
 
-Object client_config provides information about Vault server and is specified in cloudify.types.vault.ClientConfig data types.
-
-```
-  cloudify.types.vault.ClientConfig:
-    properties:
-      url:
-        description: Vault URL.
-        type: string
-        default: ''
-      token:
-        description: User Token used to authenticate to Vault.
-        type: string
-        default: ''
-      use_api_client_token:
-        type: boolean
-        description: >
-          Auto-generate and use a new API Client token with adequate
-          policies for managing Vault resources. If set to false, plugin
-          will use the Master Token for all operations.
-        required: false
-        default: false
-      client_token_policies:
-        type: list
-        description: >
-          Valid only when `use_api_client_token` is enabled. A list of
-          policies to be granted for new API Client token.
-        required: false
-        default: [secret]
-    
-```
-If plugin should use local API token (https://www.vaultproject.io/api-docs/auth/token) for secrets reading, the value of use_api_client_token must be True (by default is False). When use_api_client_token is True, master token specified in cloudify.types.vault.ClientConfig is used for generate local API token with ttl equal to 90s. You can also specify the vault API token policies under client_token_policies which is a list object.
-By default, plugin use _secret_ policy to create API token and the policy must contains correct priviliges regarding to used path
+If plugin should use a [local API token](https://www.vaultproject.io/api-docs/auth/token) for secrets reading, the value of _use_api_client_token_ must be `True` (by default it is `False`). When _use_api_client_token_ is `True`, the master token specified in _cloudify.types.vault.ClientConfig_ is used to generate a local API token with ttl equal to 90s.  
+You can also specify the vault API token policies under _client_token_policies_ which is a list object.
+By default, plugin use _secret_ policy to create API token and the policy must contains correct priviliges regarding to used path.  
 Example:
 ```
 path "secret*" {
@@ -179,9 +120,8 @@ curl -L -X POST 'http://localhost/api/v3.1/executions?_include=id' \
             {
                 "secret_key": "hello2"
             }
-        ],
-        "run_by_dependency_order": false,
-        "node_ids": ["MyResource"]
+        ]
+
     }
 }'
 ```
