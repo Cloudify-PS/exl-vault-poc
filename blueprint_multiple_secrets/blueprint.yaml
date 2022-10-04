@@ -27,7 +27,7 @@ inputs:
 dsl_definitions:
 
   vault_config: &vault_config
-    url: { get_secret: vault_server }
+    url: { get_secret: vault_url }
     token: { get_secret: vault_token }
     use_api_client_token: True
    
