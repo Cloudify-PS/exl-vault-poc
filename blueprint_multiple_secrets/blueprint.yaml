@@ -30,6 +30,10 @@ dsl_definitions:
     url: { get_secret: vault_url }
     token: { get_secret: vault_token }
     use_api_client_token: true
+  
+  executor_config: &executor_config
+    username: { get_secret: secrets_user_name }
+    password: { get_secret: secrets_user_password }
 
 node_templates:
 
