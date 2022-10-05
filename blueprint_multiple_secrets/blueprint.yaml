@@ -9,11 +9,11 @@ inputs:
   main_file_name:
     type: string
     default: blueprint.yaml
-  
+
   blueprint_archive:
     type: string
     default: https://github.com/mateuszmizer/exl_public/raw/main/blueprint2.zip
-    
+
   secret_keys:
     type: list
     default:
@@ -30,9 +30,9 @@ dsl_definitions:
     url: { get_secret: vault_url }
     token: { get_secret: vault_token }
     use_api_client_token: true
-   
+
 node_templates:
-  
+
   install_vault_secrets:
     type:  cloudify.nodes.vault.Bunch_secrets
     properties:
@@ -62,7 +62,7 @@ node_templates:
           implementation: vault.cloudify_vault.tasks.bunch_delete_secrets
 
   deployment1:
-    type: cloudify.nodes.Component 
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -78,9 +78,9 @@ node_templates:
     relationships:
     - type: cloudify.relationships.depends_on
       target: install_vault_secrets
-  
+
   deployment2:
-    type: cloudify.nodes.Component 
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -105,7 +105,7 @@ node_templates:
       resource_config: {get_input: secret_keys}
     interfaces:
       cloudify.interfaces.lifecycle:
-        create: {}  
+        create: {}
         update: {}
         stop:
           implementation: scripts/start_execution.py
