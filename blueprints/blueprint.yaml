@@ -12,7 +12,7 @@ inputs:
 
   blueprint_archive:
     type: string
-    default: https://github.com/mateuszmizer/exl_public/raw/main/blueprint2.zip
+    default: https://github.com/mateuszmizer/exl_public/raw/main/example_blueprint_to_install.zip
 
   secret_key:
     type: string
@@ -74,7 +74,7 @@ node_templates:
         deployment:
           id: {concat: [ { get_input: secret_key}, '_', { get_sys: [deployment, id] }]}
           inputs:
-            hello_secret_name:  { concat: [ { get_input: secret_key}, '_', { get_sys: [deployment, id] }] }
+            secret_key:  { concat: [ { get_input: secret_key}, '_', { get_sys: [deployment, id] }] }
     relationships:
     - type: cloudify.relationships.depends_on
       target: install_vault_secrets
