@@ -63,7 +63,7 @@ curl -X POST \
     -d '{"deployment_id":"my_deployment1", "workflow_id":"install"}' \
     "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
 ```
-\
+
 ### Temporary API token and Vault Policies
 The main [cloudify-vault-plugin](https://github.com/ahmadiesa-abu/cloudify-vault-plugin/tree/exl_changes) nodes are:
 - cloudify.nodes.vault.Secret
