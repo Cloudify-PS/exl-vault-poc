@@ -17,6 +17,15 @@ inputs:
   secret_key:
     type: string
     default: hello
+  
+  mount_point:
+    type: string
+    default: secret
+    description: >
+      name of secrets mount point
+      example:
+      aws: aws/roles or aws/config for config
+      postgresql db: database/roles or  database/config
 
 dsl_definitions:
 
@@ -88,6 +97,7 @@ node_templates:
       use_external_resource: true
       resource_config:
         create_secret: true
+        mount_point: {get_input: mount_point}
         secret_key: { get_input: secret_key}
         secret_name: { concat: [{get_input: secret_key}, '_', { get_sys: [deployment, id] }] }
     interfaces:
