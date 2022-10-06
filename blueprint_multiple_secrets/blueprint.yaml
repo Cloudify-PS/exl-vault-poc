@@ -12,7 +12,7 @@ inputs:
 
   blueprint_archive:
     type: string
-    default: https://github.com/mateuszmizer/exl_public/raw/main/blueprint2.zip
+    default: https://github.com/mateuszmizer/exl_public/raw/main/example_blueprint_to_install.zip
 
   secret_keys:
     type: list
@@ -20,9 +20,16 @@ inputs:
     - create_secret: true
       secret_key: hi
       secret_name: { concat: ['hi_', { get_sys: [deployment, id] }] }
+      mount_point: secret
     - create_secret: true
       secret_key: hello
       secret_name: { concat: ['hello_', { get_sys: [deployment, id] }] }
+      mount_point: secret
+    description: >
+      name of secrets mount point (mount_point)
+      example:
+      aws: aws/roles or aws/config for config
+      postgresql db: database/roles or  database/config
 
 dsl_definitions:
 
@@ -30,6 +37,10 @@ dsl_definitions:
     url: { get_secret: vault_url }
     token: { get_secret: vault_token }
     use_api_client_token: true
+  
+  executor_config: &executor_config
+    username: { get_secret: secrets_user_name }
+    password: { get_secret: secrets_user_password }
 
 node_templates:
 
@@ -74,7 +85,7 @@ node_templates:
         deployment:
           id: deployment1
           inputs:
-            hello_secret_name:  { concat: [ 'hello_', { get_sys: [deployment, id] }] }
+            secret_key:  { concat: [ 'hello_', { get_sys: [deployment, id] }] }
     relationships:
     - type: cloudify.relationships.depends_on
       target: install_vault_secrets
@@ -91,7 +102,7 @@ node_templates:
         deployment:
           id: deployment2
           inputs:
-            hello_secret_name:  { concat: [ 'hi_', { get_sys: [deployment, id] }] }
+            secret_key:  { concat: [ 'hi_', { get_sys: [deployment, id] }] }
     relationships:
     - type: cloudify.relationships.depends_on
       target: install_vault_secrets

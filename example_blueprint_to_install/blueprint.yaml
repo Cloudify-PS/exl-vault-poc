@@ -8,26 +8,24 @@ description: >
 imports:
   #The types.yaml contains the basic building blocks of a blueprint
   - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
-
-# Defining input that will be populated as an output once the deployment is executed
 inputs:
-  #This is our input hello, a default value world is defined to it
-  hello:
-    description: Say Hello to
-    default: World
+  secret_key:
+    description: Name of secret
 
 #This is the topology section where we define the managed resources (node_templates) and relationships between them
 node_templates:
-  #Every blueprint must define at least one node.
-  #In this example we define an empty Application Module that will not perform any action
-  MyResource:
-    #The resource type is defined in the imported plugins,
-    #In this case the type cloudify.nodes.ApplicationModule is defined in the types.yaml
-    type:  cloudify.nodes.ApplicationModule
+  
+  node1:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: scripts/sleep.py
+          executor: central_deployment_agent
+          inputs:
+            timeout: 30
 
-#The output section expose resources that are needed by external users or software.
-#In this case were printing the value of the input named hello.
 capabilities:
   #we have defined the output hellow and assigned it a the value of the input hello
-  hello:
-    value:  { get_input: hello }
+  secret_value:
+    value:  {get_secret: { get_input: secret_key }}
