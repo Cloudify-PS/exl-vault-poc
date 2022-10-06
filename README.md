@@ -103,15 +103,18 @@ It consists of 3 phases:
 
 Requirements of the workflow:
  - local secrets:
-    - _vault_token_ - token to read from Vault
-    - _vault_url_ - full URL and port of Vault (for example: "http://10.10.10.10:8200")
+   - _vault_token_ - token to read from Vault
+   - _vault_url_ - full URL and port of Vault (for example: "http://10.10.10.10:8200")
+   - _secrets_user_name_ - name of user which is responsible for secret handling
+   - _secrets_user_password_ - password of user which is responsible for secret handling
  - workflow inputs:
     - deployment_id
     - workflow_id
-    - target workflow_id
-    - target_deployment_id
-    - secret_list
-    - any other inputs required for the target workflow to operate
+    - secrets_node_ids
+    - secrets_node_instance_ids
+    - workflow_node_ids
+    - workflow_node_instance_ids
+    - workflow_params 
 
 An example of how to use the workflow:
 ```
@@ -122,19 +125,13 @@ curl -L -X POST 'http://localhost/api/v3.1/executions?_include=id' \
 --data-raw '{
     "deployment_id": "de6ded0b-546f-4584-9ae4-bd081cd17073",
     "workflow_id": "execute_with_secrets",
-    "allow_custom_parameters": true,
     "parameters": {
         "workflow_id": "restart",
-        "target_deployment_id": "hello_de6ded0b-546f-4584-9ae4-bd081cd17073",
-        "secret_list": [
-            {
-                "secret_key": "hello"
-            },
-            {
-                "secret_key": "hello2"
-            }
-        ]
-
+        "secrets_node_ids": ["install_vault_secrets"],
+        "workflow_node_ids": ["deployment"],
+        "workflow_params": {
+            "run_by_dependency_order": false
+        }
     }
-}'
+}''
 ```
