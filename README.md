@@ -18,6 +18,7 @@ Requirements of the blueprint:
  - blueprint inputs:
    - _main_file_name_ - name of main blueprint in package (wrapped deployment)
    - _blueprint_archive_ - url to package (wrapped)
+   - _mount_point_ - Vault path to mounted secrets (path must be enabled), it can be [aws path](https://www.vaultproject.io/docs/secrets/aws), [postgresql secret](https://www.vaultproject.io/docs/secrets/databases/postgresql) or [the simplest secrets](https://www.vaultproject.io/docs/secrets)
    - _secret_key_ - name of Vault secret to populate (only for blueprints)
    - _secret_keys_ - list of Vault secrets (only for blueprint_multiple_secrets)
 
