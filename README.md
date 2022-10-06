@@ -43,7 +43,7 @@ curl -X PUT \
     "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
 ```
 
-### Create deployment  blueprint_multiple_secrets
+### Create deployment blueprint_multiple_secrets
 ```
 curl -X PUT \
     --header "Tenant: default_tenant" \
@@ -52,6 +52,16 @@ curl -X PUT \
     -d '{"blueprint_id": "main_blueprint", "inputs": {"main_file_name": "blueprint_child.yaml", "blueprint_archive": "https://url/to_child/archive/master.zip", "secret_keys": ["vaultkey1", "vaultkey2"] }, "visibility": "tenant", "site_name": "LONDON", "labels": [{"customer": "EXL1"}]}' \
     "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
 ```
+### Install/uninstall
+```
+curl -X POST \
+    --header "Tenant: default_tenant" \
+    --header "Content-Type: application/json" \
+    -u admin:admin \
+    -d '{"deployment_id":"my_deployment1", "workflow_id":"install"}' \
+    "http://localhost/api/v3.1/deployments/my_deployment1?_include=id"
+```
+\
 ### Temporary API token and Vault Policies
 The main [cloudify-vault-plugin](https://github.com/ahmadiesa-abu/cloudify-vault-plugin/tree/exl_changes) nodes are:
 - cloudify.nodes.vault.Secret
