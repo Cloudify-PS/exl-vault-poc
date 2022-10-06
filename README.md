@@ -78,7 +78,7 @@ Object _executor_user_config_ provides information about user which is responsib
 
 If plugin should use a [local API token](https://www.vaultproject.io/api-docs/auth/token) for secrets reading, the value of _use_api_client_token_ must be `True` (by default it is `False`). When _use_api_client_token_ is `True`, the master token specified in _cloudify.types.vault.ClientConfig_ is used to generate a local API token with ttl equal to 90s.  
 You can also specify the vault API token policies under _client_token_policies_ which is a list object.
-By default, plugin use _secret_ policy to create API token and the policy must contains correct priviliges regarding to used path.  
+By default, plugin use _secret_ policy to create API token and the [policy](https://www.vaultproject.io/docs/concepts/policies) must contains correct priviliges regarding to used path.  
 Example:
 ```
 path "secret*" {
@@ -89,7 +89,6 @@ path "secret/data/foo" {
   capabilities = ["read"]
 }
 ```
-(more information about policy here: https://www.vaultproject.io/docs/concepts/policies)
 
 ## Custom workflows
 The examples of running workflows using Cloudify Manager's API calls are implemented in the Postman Collection: https://www.getpostman.com/collections/e76f72a2a89d598509ac
