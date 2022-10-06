@@ -125,31 +125,3 @@ curl -L -X POST 'http://localhost/api/v3.1/executions?_include=id' \
     }
 }'
 ```
-
-### remove_local_secrets
-
-Leveraged also in _execute_with_secrets_, _remove_local_secrets_ workflow takes a list of secret names and removes them from the local Cloudify Manager's secret store.  
-Requirements of the workflow:
- - local secrets:
-    - _vault_token_ - token to read from Vault
-    - _vault_url_ - full URL and port of Vault (for example: "http://10.10.10.10:8200")
- - workflow inputs:
-    - secret_list - a list of secret names to be removed from local Secret Store
-
-An example of how to use the workflow:
-```
-curl -L -X POST 'http://localhost/api/v3.1/executions?_include=id' \
--H 'Tenant: default_tenant' \
--H 'Content-Type: application/json' \
--u admin:admin \
---data-raw '{
-    "deployment_id": "d7f16305-05b3-4976-aa59-b3195abcbc3e",
-    "workflow_id": "remove_local_secrets",
-    "parameters": {
-        "secret_list": [
-            "hello-2d7741b2-4789-487e-bd06-74464f85bfa0",
-            "hello2-2d7741b2-4789-487e-bd06-74464f85bfa0"
-        ]
-    }
-}'
-```

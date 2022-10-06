@@ -39,8 +39,8 @@ node_templates:
       use_external_resource: true
       resource_config:
         create_secret: true
-        secret_key: {get_input: secret_key}
-        secret_name: { concat: [{get_input: secret_key}, '_', { get_sys: [deployment, id] }] }
+        secret_key: { get_input: secret_key }
+        secret_name: { concat: [{ get_input: secret_key }, '_', { get_sys: [deployment, id] }] }
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
@@ -87,8 +87,8 @@ node_templates:
       use_external_resource: true
       resource_config:
         create_secret: true
-        secret_key: { get_input: secret_key}
-        secret_name: { concat: [{get_input: secret_key}, '_', { get_sys: [deployment, id] }] }
+        secret_key: { get_input: secret_key }
+        secret_name: { concat: [{ get_input: secret_key }, '_', { get_sys: [deployment, id] }] }
     interfaces:
       cloudify.interfaces.lifecycle:
         create: {}
