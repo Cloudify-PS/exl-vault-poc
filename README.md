@@ -12,9 +12,11 @@ It consists of 3 phases:
 
 Requirements of the blueprint:
 
- - local secrets:
+ - local secrets (hidden for current user, created by secrets_user_name):
    - _vault_token_ - token to read from Vault
    - _vault_url_ - full URL and port of Vault (for example: "http://10.10.10.10:8200")
+   - _secrets_user_name_ - name of user which is responsible for secret handling
+   - _secrets_user_password_ - password of user which is responsible for secret handling
  - blueprint inputs:
    - _main_file_name_ - name of main blueprint in package (wrapped deployment)
    - _blueprint_archive_ - url to package (wrapped)
@@ -71,7 +73,8 @@ They are used to create or read a single or multiple Vault secrets at once (acco
 Each node type has information about the resource in its _resource_config_ property of _cloudify.types.vault.Secret_ type.  
 For more details please refer to the [plugin.yaml](https://github.com/ahmadiesa-abu/cloudify-vault-plugin/blob/exl_changes/plugin.yaml) file of the plugin.  
 _use_external_resource_ property provides information if secrets already exist in the Vault (if `False`, plugin will create the secret).  
-Object _client_config_ provides information about Vault server and its connection. It is specified in _cloudify.types.vault.ClientConfig_ data type.  
+Object _client_config_ deliver information about Vault server and its connection. It is specified in _cloudify.types.vault.ClientConfig_ data type.
+Object _executor_user_config_ provides information about user which is responsible for secrets management (creation, deleting - only this user can view the value of secrets)
 
 If plugin should use a [local API token](https://www.vaultproject.io/api-docs/auth/token) for secrets reading, the value of _use_api_client_token_ must be `True` (by default it is `False`). When _use_api_client_token_ is `True`, the master token specified in _cloudify.types.vault.ClientConfig_ is used to generate a local API token with ttl equal to 90s.  
 You can also specify the vault API token policies under _client_token_policies_ which is a list object.
