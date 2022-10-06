@@ -39,6 +39,7 @@ node_templates:
       use_external_resource: true
       resource_config:
         create_secret: true
+        mount_point: {get_input: mount_point}
         secret_key: {get_input: secret_key}
         secret_name: { concat: [{get_input: secret_key}, '_', { get_sys: [deployment, id] }] }
     interfaces:

@@ -20,9 +20,16 @@ inputs:
     - create_secret: true
       secret_key: hi
       secret_name: { concat: ['hi_', { get_sys: [deployment, id] }] }
+      mount_point: secrets
     - create_secret: true
       secret_key: hello
       secret_name: { concat: ['hello_', { get_sys: [deployment, id] }] }
+      mount_point: secrets
+    description: >
+      name of secrets mount point (mount_point)
+      example:
+      aws: aws/roles or aws/config for config
+      postgresql db: database/roles or  database/config
 
 dsl_definitions:
 
